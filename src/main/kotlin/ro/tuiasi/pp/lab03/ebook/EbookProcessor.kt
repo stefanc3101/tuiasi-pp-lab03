@@ -17,9 +17,8 @@ class EbookProcessor {
      * @return Textul cu spații multiple normalizate
      */
     fun removeMultipleSpaces(text: String): String {
-        // TODO("De implementat")
-        // Indiciu: folosiți Regex(" {2,}") sau " +" și replace cu " "
-        TODO("De implementat: înlocuiește 2+ spații consecutive cu un singur spațiu")
+        // Cauta 2 sau mai multe spatii consecutive (" {2,}") si le inlocuieste cu unul singur
+        return text.replace(Regex(" {2,}"), " ")
     }
 
     /**
@@ -31,10 +30,8 @@ class EbookProcessor {
      * @return Textul cu linii goale multiple normalizate
      */
     fun removeMultipleNewlines(text: String): String {
-        // TODO("De implementat")
-        // Indiciu: o "linie goală" înseamnă \n\n (sau \r\n\r\n pe Windows)
-        // Folosiți Regex("(\r?\n){3,}") și înlocuiți cu "\n\n"
-        TODO("De implementat: înlocuiește 3+ caractere newline consecutive cu exact 2")
+        // Cauta 3 sau mai multe delimitatoare de linie (suporta atat Windows \r\n cat si Linux \n)
+        return text.replace(Regex("(\\r?\\n){3,}"), "\n\n")
     }
 
     /**
@@ -47,11 +44,8 @@ class EbookProcessor {
      * @return Textul cu numerele de pagină eliminate
      */
     fun removePageNumbers(text: String): String {
-        // TODO("De implementat")
-        // Indiciu: un număr de pagină este un șir de cifre care apare singur pe o linie
-        // Regex sugerată: Regex("^\\s*\\d+\\s*$", RegexOption.MULTILINE)
-        // Înlocuiți potrivirile cu "" (șir gol)
-        TODO("De implementat: elimină liniile care conțin doar un număr (număr de pagină)")
+        // ^ si $ reprezinta inceputul si finalul liniei in modul MULTILINE
+        return text.replace(Regex("^\\s*\\d+\\s*$", RegexOption.MULTILINE), "")
     }
 
     /**
@@ -64,11 +58,10 @@ class EbookProcessor {
      * @return Textul cu caracterele românești corectate
      */
     fun fixRomanianChars(text: String): String {
-        // TODO("De implementat") — opțional
-        // Înlocuiri necesare:
-        // 'ş' (U+015F, s cu cedilă) → 'ș' (U+0219, s cu virgulă dedesubt)
-        // 'ţ' (U+0163, t cu cedilă) → 'ț' (U+021B, t cu virgulă dedesubt)
-        // 'Ş' → 'Ș', 'Ţ' → 'Ț'
-        TODO("De implementat (opțional): corectează maparea veche a diacriticelor românești")
+        // Aplicam succesiv replace pentru caracterele gresite
+        return text.replace('ş', 'ș')
+            .replace('ţ', 'ț')
+            .replace('Ş', 'Ș')
+            .replace('Ţ', 'Ț')
     }
 }

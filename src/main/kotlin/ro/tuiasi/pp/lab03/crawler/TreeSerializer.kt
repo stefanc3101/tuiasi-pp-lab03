@@ -10,10 +10,10 @@ package ro.tuiasi.pp.lab03.crawler
  *
  * Exemplu:
  * ```
- * https://example.com
- * \thttps://example.com/pagina1
- * \t\thttps://example.com/sub1
- * \thttps://example.com/pagina2
+ * [https://example.com](https://example.com)
+ * \t[https://example.com/pagina1](https://example.com/pagina1)
+ * \t\t[https://example.com/sub1](https://example.com/sub1)
+ * \t[https://example.com/pagina2](https://example.com/pagina2)
  * ```
  */
 class TreeSerializer {
@@ -25,14 +25,21 @@ class TreeSerializer {
      * @return Reprezentarea textuală a arborelui
      */
     fun serialize(root: LinkNode): String {
-        // TODO("De implementat")
-        // Pași de urmat:
-        // 1. Creați un StringBuilder
-        // 2. Definiți o funcție recursivă internă care primește un nod și adâncimea curentă
-        // 3. La fiecare apel: adăugați (adâncime × '\t') + nod.url + '\n'
-        // 4. Apelați recursiv pentru fiecare copil cu adâncime + 1
-        // 5. Returnați conținutul StringBuilder-ului
-        TODO("De implementat: serializează arborele în format bazat pe indentare TAB")
+        // Folosim StringBuilder pentru a construi eficient string-ul final
+        val builder = java.lang.StringBuilder()
+
+        // Definim o functie recursiva locala pentru a parcurge arborele
+        fun traverse(node: LinkNode, depth: Int) {
+            // Adaugam tab-urile corespunzatoare adancimii, urmate de URL si linie noua
+            builder.append("\t".repeat(depth)).append(node.url).append("\n")
+            // Apelam recursiv pentru fiecare copil, crescand adancimea cu 1
+            for (child in node.children) {
+                traverse(child, depth + 1)
+            }
+        }
+
+        traverse(root, 0)
+        return builder.toString()
     }
 
     /**
@@ -43,14 +50,34 @@ class TreeSerializer {
      * @throws IllegalArgumentException dacă șirul este gol sau invalid
      */
     fun deserialize(input: String): LinkNode {
-        // TODO("De implementat")
-        // Pași de urmat:
-        // 1. Împărțiți input-ul în linii (filtrați liniile goale)
-        // 2. Pentru fiecare linie, numărați TAB-urile de la început → aceasta este adâncimea nodului
-        // 3. URL-ul nodului este linia fără TAB-urile de la început (trimStart('\t'))
-        // 4. Mențineți o stivă (sau listă) cu nodurile de pe fiecare nivel de adâncime
-        // 5. Primul nod (adâncime 0) este rădăcina
-        // 6. Un nod de adâncime N este copilul nodului de adâncime N-1 din vârful stivei
-        TODO("De implementat: reconstruiește arborele din formatul bazat pe indentare TAB")
+        // Impartim textul in linii si le ignoram pe cele complet goale
+        val lines = input.lines().filter { it.isNotEmpty() }
+        if (lines.isEmpty()) {
+            throw IllegalArgumentException("Input-ul nu poate fi gol")
+        }
+
+        // Prima linie este mereu radacina (adancime 0)
+        val rootUrl = lines[0].trimStart('\t')
+        val root = LinkNode(rootUrl)
+
+        // Folosim un map pentru a tine minte ultimul nod vazut la fiecare nivel de adancime
+        val lastNodeAtDepth = mutableMapOf<Int, LinkNode>()
+        lastNodeAtDepth[0] = root
+
+        for (i in 1 until lines.size) {
+            val line = lines[i]
+            // Numaram tab-urile pentru a afla adancimea curenta
+            val depth = line.takeWhile { it == '\t' }.length
+            val url = line.trimStart('\t')
+            val node = LinkNode(url)
+
+            // Salvam nodul curent la adancimea sa
+            lastNodeAtDepth[depth] = node
+
+            // Il adaugam ca si copil la ultimul nod de pe nivelul superior (parintele)
+            lastNodeAtDepth[depth - 1]?.children?.add(node)
+        }
+
+        return root
     }
 }
